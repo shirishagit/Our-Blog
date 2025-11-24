@@ -1,18 +1,18 @@
 import multer from "multer";
 
+// Use memory storage instead of disk storage
+const storage = multer.memoryStorage();
 
 const upload = multer({
-    dest: 'uploads/', // specify the destination directory for uploaded files
+    storage, // store file in memory buffer
     limits: {
-        fileSize: 5 * 1024 * 1024, // limit file size to 5MB
+        fileSize: 5 * 1024 * 1024, // 5MB limit
     },
     fileFilter: (req, file, cb) => {
-        // Accept only image files
-        if (file.mimetype.startsWith('image/')) {
+        if (file.mimetype.startsWith("image/")) {
             cb(null, true);
-        }
-        else {
-            cb(new Error('Only image files are allowed!'), false);
+        } else {
+            cb(new Error("Only image files are allowed!"), false);
         }
     }
 });

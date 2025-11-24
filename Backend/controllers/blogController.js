@@ -3,11 +3,13 @@ import imageKit from '../configs/imageKit.js';
 import Blog from '../models/Blog.js';
 
 // ADD BLOG
+// ADD BLOG
 export const addBlog = async (req, res) => {
     try {
         const { title, subtitle, discription, category, isPublished } = req.body;
         const imagefile = req.file;
 
+        // Validation
         if (!title || !discription || !imagefile) {
             return res.status(400).json({
                 message: "Title, description and image are required",
@@ -15,16 +17,14 @@ export const addBlog = async (req, res) => {
             });
         }
 
-        const fileBuffer = fs.readFileSync(imagefile.path);
-
+        // Upload directly from memory buffer
         const response = await imageKit.upload({
-            file: fileBuffer,
+            file: imagefile.buffer,  // <-- this is the fix
             fileName: imagefile.originalname,
             folder: "/blogs"
         });
 
-        fs.unlink(imagefile.path, () => {});
-
+        // Generate optimized Image URL  
         const optimizedImageUrl = imageKit.url({
             path: response.filePath,
             transformation: [
@@ -34,6 +34,7 @@ export const addBlog = async (req, res) => {
             ]
         });
 
+        // Save blog to DB
         await Blog.create({
             title,
             subtitle,
@@ -54,70 +55,5 @@ export const addBlog = async (req, res) => {
             message: "Error adding blog",
             success: false
         });
-    }
-};
-
-
-// FETCH ALL BLOGS (ADMIN)
-export const getAllBlogs = async (req, res) => {
-    try {
-        const blogs = await Blog.find();
-        res.json({ blogs, success: true });
-    } catch (error) {
-        res.json({ message: "Error fetching blogs", success: false });
-    }
-};
-
-
-// GET BLOG BY ID
-export const getBlogById = async (req, res) => {
-    try {
-        const { blogId } = req.params;
-        const blog = await Blog.findOne({ _id: blogId });
-        res.json({ blog, success: true });
-    }
-    catch (error) {
-        res.json({ message: "Error fetching blog", success: false });
-    }
-};
-
-
-// DELETE BLOG
-export const deleteBlogById = async (req, res) => {
-    try {
-        const { blogId } = req.params;
-        await Blog.findByIdAndDelete(blogId);
-
-        res.json({ message: "Blog deleted successfully", success: true });
-    }
-    catch (error) {
-        res.json({ message: "Error deleting blog", success: false });
-    }
-};
-
-
-// TOGGLE PUBLISH
-export const togglePublish = async (req, res) => {
-    try {
-        const { blogId } = req.params;
-
-        const blog = await Blog.findById(blogId);
-        if (!blog) {
-            return res.status(404).json({
-                message: "Blog not found",
-                success: false
-            });
-        }
-
-        blog.isPublished = !blog.isPublished;
-        await blog.save();
-
-        res.json({
-            message: "Blog status updated",
-            success: true
-        });
-    }
-    catch (error) {
-        res.json({ message: "Error toggling publish status", success: false });
     }
 };
