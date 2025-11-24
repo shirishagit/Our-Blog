@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "server": "nodemon server.js",
-    "start": "npm install --omit=dev"
+    "start": "npm run server",
+     "build": "npm install --omit=dev"
   },
   "keywords": [],
   "author": "",
