@@ -57,3 +57,10 @@ export const addBlog = async (req, res) => {
         });
     }
 };
+export const getAllBlogs = async (req, res) => { try { const blogs = await Blog.find(); res.json({ blogs, success: true }); } catch (error) { res.json({ message: "Error fetching blogs", success: false }); } }; 
+// GET BLOG BY ID 
+export const getBlogById = async (req, res) => { try { const { blogId } = req.params; const blog = await Blog.findOne({ _id: blogId }); res.json({ blog, success: true }); } catch (error) { res.json({ message: "Error fetching blog", success: false }); } }; 
+// DELETE BLOG 
+export const deleteBlogById = async (req, res) => { try { const { blogId } = req.params; await Blog.findByIdAndDelete(blogId); res.json({ message: "Blog deleted successfully", success: true }); } catch (error) { res.json({ message: "Error deleting blog", success: false }); } }; 
+// TOGGLE PUBLISH 
+export const togglePublish = async (req, res) => { try { const { blogId } = req.params; const blog = await Blog.findById(blogId); if (!blog) { return res.status(404).json({ message: "Blog not found", success: false }); } blog.isPublished = !blog.isPublished; await blog.save(); res.json({ message: "Blog status updated", success: true }); } catch (error) { res.json({ message: "Error toggling publish status", success: false }); } };
