@@ -61,8 +61,6 @@ const Dashboard = () => {
             <p className='text-gray-400 font-light'>Drafts</p>
            </div>
          </div>
-         
-         
       </div>
        <div >
         <div className='flex item-center gap-3 m-4 mt-6 text-gray-600'>
